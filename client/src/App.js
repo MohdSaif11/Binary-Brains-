@@ -11,8 +11,8 @@ function App() {
     if (saved === "true") setLoggedIn(true);
   }, []);
 
-  const handleLogin = (status) => {
-    setLoggedIn(status);
+  const handleLogin = () => {
+    setLoggedIn(true);
     localStorage.setItem("loggedIn", "true");
   };
 
@@ -24,15 +24,58 @@ function App() {
   if (!loggedIn) return <Login onLogin={handleLogin} />;
 
   return (
-    <div style={{ background: "#0f172a", minHeight: "100vh", color: "white", padding: "20px" }}>
-      <div style={{ textAlign: "right" }}>
-        <button onClick={handleLogout}>Logout</button>
+    <div style={{ display: "flex", height: "100vh" }}>
+      
+      {/* 📊 MAIN DASHBOARD (LEFT) */}
+      <div
+        style={{
+          flex: 1,
+          background: "#0f172a",
+          color: "white",
+          padding: "20px",
+          overflowY: "auto",
+        }}
+      >
+        {/* Logout */}
+        <div style={{ textAlign: "right" }}>
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: "8px 15px",
+              borderRadius: "8px",
+              border: "none",
+              background: "#ef4444",
+              color: "white",
+              cursor: "pointer",
+            }}
+          >
+            Logout
+          </button>
+        </div>
+
+        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
+          🚀 Customer Success AI
+        </h1>
+
+        <Dashboard />
       </div>
 
-      <h1 style={{ textAlign: "center" }}>🚀 Customer Success AI</h1>
+      {/* 🤖 CHATBOT (RIGHT SIDE) */}
+      <div
+        style={{
+          width: "300px",
+          background: "#0f172a",
+          color: "white",
+          padding: "20px",
+          borderLeft: "1px solid #1e293b", // 👈 changed side
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        <h2 style={{ marginBottom: "20px" }}>🤖 AI Assistant</h2>
+        <Chatbot />
+      </div>
 
-      <Dashboard />
-      <Chatbot />
     </div>
   );
 }

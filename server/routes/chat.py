@@ -1,22 +1,33 @@
 from flask import Blueprint, request, jsonify
-import openai
+from data.customers import customers
 
 chat_bp = Blueprint("chat", __name__)
 
-openai.api_key = "YOUR_API_KEY"  # 🔥 put your key here
-
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-    msg = request.json.get("message")
+    msg = request.json.get("message", "").lower()
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a customer success AI assistant."},
-            {"role": "user", "content": msg}
-        ]
-    )
+    # 🔍 Find risky customers
+    risky = [c for c in customers if c["tickets"] > 5 or c["usage"] < 40]
 
-    reply = response["choices"][0]["message"]["content"]
+    if "risk" in msg:
+        if risky:
+            names = ", ".join([c["name"] for c in risky])
+            reply = f"These customers are at risk: {names}. This is due to high tickets or low usage."
+        else:
+            reply = "No customers are currently at high risk."
+
+    elif "churn" in msg:
+        reply = "Customers with low usage and high support tickets are more likely to churn."
+
+    elif "improve" in msg:
+        reply = "To improve customer health, increase engagement and reduce support issues."
+
+    elif "customer" in msg:
+        details = ", ".join([f"{c['name']} ({c['region']})" for c in customers])
+        reply = f"Here are your customers: {details}"
+
+    else:
+        reply = "Try asking about risk, churn, or customer insights."
 
     return jsonify({"reply": reply})
