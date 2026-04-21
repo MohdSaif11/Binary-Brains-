@@ -6,23 +6,38 @@ function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-
+  
   const handleLogin = async () => {
-    try {
-      const res = await fetch("http://127.0.0.1:5000/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch("http://127.0.0.1:5000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email,
+        password
+      })
+    });
 
-      const data = await res.json();
-      if (data.success) onLogin(true);
-      else alert("Invalid credentials");
-    } catch {
-      alert("Backend not running");
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Login successful ✅");
+
+      // ✅ THIS IS THE FIX
+      onLogin();
+
+    } else {
+      alert(data.error || "Login failed ❌");
     }
-  };
 
+  } catch (err) {
+    console.error(err);
+    alert("Backend not running ❌");
+  }
+};
+     
   const handleSignup = async () => {
     await fetch("http://127.0.0.1:5000/signup", {
       method: "POST",

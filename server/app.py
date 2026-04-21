@@ -1,20 +1,15 @@
 from flask import Flask
 from flask_cors import CORS
-
-from routes.customers import customers_bp
-from routes.health import health_bp
-from routes.churn import churn_bp
+from routes.auth import auth_bp
 from routes.chat import chat_bp
-from routes.auth import auth_bp   # 🔥 IMPORTANT
+from routes.customers import customers_bp
 
 app = Flask(__name__)
-CORS(app)   # 🔥 MUST BE HERE
+CORS(app)
 
 app.register_blueprint(customers_bp)
-app.register_blueprint(health_bp)
-app.register_blueprint(churn_bp)
-app.register_blueprint(chat_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(chat_bp)
 
 @app.route("/")
 def home():

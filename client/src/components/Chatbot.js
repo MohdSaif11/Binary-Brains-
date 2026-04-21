@@ -3,13 +3,16 @@ import React, { useState } from "react";
 function Chatbot() {
   const [msg, setMsg] = useState("");
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const send = async () => {
     if (!msg.trim()) return;
 
-    // Add user message
-    const newMessages = [...messages, { type: "user", text: msg }];
-    setMessages(newMessages);
+    const userMessage = { type: "user", text: msg };
+
+    // ✅ Add user message first
+    setMessages((prev) => [...prev, userMessage]);
+    setLoading(true);
 
     try {
       const res = await fetch("http://127.0.0.1:5000/chat", {
@@ -22,20 +25,25 @@ function Chatbot() {
 
       const data = await res.json();
 
-      // Add bot reply
-      setMessages([
-        ...newMessages,
-        { type: "bot", text: data.reply }
-      ]);
+      const botMessage = {
+        type: "bot",
+        text: data.reply || "No response from AI 🤖"
+      };
 
-    } catch {
-      setMessages([
-        ...newMessages,
+      // ✅ Append bot reply safely
+      setMessages((prev) => [...prev, botMessage]);
+
+    } catch (err) {
+      console.error(err);
+
+      setMessages((prev) => [
+        ...prev,
         { type: "bot", text: "Error connecting to server ❌" }
       ]);
     }
 
     setMsg("");
+    setLoading(false);
   };
 
   return (
@@ -44,7 +52,7 @@ function Chatbot() {
       flexDirection: "column",
       height: "100%"
     }}>
-      
+
       {/* 💬 CHAT MESSAGES */}
       <div style={{
         flex: 1,
@@ -80,6 +88,13 @@ function Chatbot() {
             </div>
           </div>
         ))}
+
+        {/* ⏳ LOADING MESSAGE */}
+        {loading && (
+          <div style={{ color: "#aaa", fontSize: "12px" }}>
+            AI is typing...
+          </div>
+        )}
       </div>
 
       {/* ✍️ INPUT AREA */}
@@ -99,11 +114,12 @@ function Chatbot() {
 
         <button
           onClick={send}
+          disabled={loading}
           style={{
             padding: "10px 15px",
             borderRadius: "10px",
             border: "none",
-            background: "#3b82f6",
+            background: loading ? "#64748b" : "#3b82f6",
             color: "white",
             cursor: "pointer"
           }}

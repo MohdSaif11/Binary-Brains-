@@ -1,32 +1,35 @@
 from flask import Blueprint, request, jsonify
-import json, os
 
 auth_bp = Blueprint("auth", __name__)
-FILE = "users.json"
 
-def load_users():
-    if not os.path.exists(FILE):
-        return []
-    return json.load(open(FILE))
+# 🧠 simple users DB
+users = []
 
-def save_users(users):
-    json.dump(users, open(FILE, "w"))
-
+# ✅ SIGNUP
 @auth_bp.route("/signup", methods=["POST"])
 def signup():
-    data = request.json
-    users = load_users()
-    users.append(data)
-    save_users(users)
-    return jsonify({"message": "User created"})
+    data = request.get_json()
 
+    user = {
+        "email": data.get("email"),
+        "password": data.get("password")
+    }
+
+    users.append(user)
+
+    return jsonify({"message": "User registered"})
+
+
+# ✅ LOGIN
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    data = request.json
-    users = load_users()
+    data = request.get_json()
 
-    for u in users:
-        if u["email"] == data["email"] and u["password"] == data["password"]:
-            return jsonify({"success": True})
+    email = data.get("email")
+    password = data.get("password")
 
-    return jsonify({"success": False})
+    for user in users:
+        if user["email"] == email and user["password"] == password:
+            return jsonify({"message": "Login successful"})
+
+    return jsonify({"error": "Invalid credentials"}), 401
