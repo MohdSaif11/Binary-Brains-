@@ -15,10 +15,14 @@ function Dashboard() {
   const [filterRisk, setFilterRisk] = useState("");
 const [filterRegion, setFilterRegion] = useState("");
 const [sortByUsage, setSortByUsage] = useState(false);
-  const loadCustomers = async () => {
+ // ONLY URL + syntax fixes done
+
+const BASE_URL = "https://binary-brains-uttd.onrender.com";
+
+const loadCustomers = async () => {
   setLoading(true);
   try {
-    const res = await fetch("http://127.0.0.1:5000/customers");
+    const res = await fetch(`${BASE_URL}/customers`);
     const data = await res.json();
     setCustomers(data);
   } catch (err) {
@@ -27,21 +31,13 @@ const [sortByUsage, setSortByUsage] = useState(false);
   setLoading(false);
 };
 
-  useEffect(() => {
-    loadCustomers();
-  }, []);
-  const showToast = (msg) => {
-  setToast(msg);
-  setTimeout(() => setToast(""), 3000); // disappears after 3 sec
-};
-
-  const addCustomer = async () => {
-    if (!name || !region) {
-      showToast("Enter name and region");
-      return;
-    }
-try{
-    await fetch("http://127.0.0.1:5000/customers", {
+const addCustomer = async () => {
+  if (!name || !region) {
+    showToast("Enter name and region");
+    return;
+  }
+  try {
+    await fetch(`${BASE_URL}/customers`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -52,15 +48,15 @@ try{
     setName("");
     setRegion("");
     loadCustomers();
-  }catch (err) {
+  } catch (err) {
     showToast("Something went wrong ");
     console.error(err);
   }
 };
 
-  const deleteCustomer = async (id) => {
-    try{
-    await fetch(`http://127.0.0.1:5000/customers/${id}`, {
+const deleteCustomer = async (id) => {
+  try {
+    await fetch(`${BASE_URL}/customers/${id}`, {
       method: "DELETE"
     });
     loadCustomers();
@@ -70,9 +66,9 @@ try{
   }
 };
 
-  const addTicket = async (id) => {
-    try{
-    await fetch(`http://127.0.0.1:5000/customers/${id}/ticket`, {
+const addTicket = async (id) => {
+  try {
+    await fetch(`${BASE_URL}/customers/${id}/ticket`, {
       method: "POST"
     });
     loadCustomers();
@@ -82,11 +78,12 @@ try{
   }
 };
 
-  const addDevice = async (id) => {
-    const device = prompt("Enter device name");
-    if (!device) return;
-    try{
-    await fetch(`http://127.0.0.1:5000/customers/${id}/device`, {
+const addDevice = async (id) => {
+  const device = prompt("Enter device name");
+  if (!device) return;
+
+  try {
+    await fetch(`${BASE_URL}/customers/${id}/device`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -95,15 +92,15 @@ try{
     });
 
     loadCustomers();
-  }catch (err) {
+  } catch (err) {
     showToast("Something went wrong ");
     console.error(err);
   }
 };
 
-  const getSummary = async (id) => {
-    try{
-    const res = await fetch(`http://127.0.0.1:5000/customers/${id}/summary`);
+const getSummary = async (id) => {
+  try {
+    const res = await fetch(`${BASE_URL}/customers/${id}/summary`);
     const data = await res.json();
     alert(data.summary);
   } catch (err) {
@@ -131,7 +128,7 @@ try{
 
   <input
     className="search"
-    placeholder="🔍 Search customer..."
+    placeholder=" Search customer..."
     value={search}
     onChange={(e) => setSearch(e.target.value)}
   />
