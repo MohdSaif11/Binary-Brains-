@@ -18,6 +18,12 @@ const [sortByUsage, setSortByUsage] = useState(false);
  // ONLY URL + syntax fixes done
 
 const BASE_URL = "https://binary-brains-uttd.onrender.com";
+const showToast = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  };
+
+
 
 const loadCustomers = async () => {
   setLoading(true);
@@ -30,6 +36,10 @@ const loadCustomers = async () => {
   }
   setLoading(false);
 };
+useEffect(() => {
+    loadCustomers();
+  }, []);
+
 
 const addCustomer = async () => {
   if (!name || !region) {
@@ -48,11 +58,11 @@ const addCustomer = async () => {
     setName("");
     setRegion("");
     loadCustomers();
-  } catch (err) {
-    showToast("Something went wrong ");
-    console.error(err);
-  }
-};
+  }catch (err) {
+      showToast("Something went wrong ");
+      
+    }
+  };
 
 const deleteCustomer = async (id) => {
   try {
@@ -62,7 +72,7 @@ const deleteCustomer = async (id) => {
     loadCustomers();
   } catch (err) {
     showToast("Something went wrong ");
-    console.error(err);
+    
   }
 };
 
@@ -74,7 +84,6 @@ const addTicket = async (id) => {
     loadCustomers();
   } catch (err) {
     showToast("Something went wrong ");
-    console.error(err);
   }
 };
 
@@ -90,11 +99,9 @@ const addDevice = async (id) => {
       },
       body: JSON.stringify({ device })
     });
-
     loadCustomers();
   } catch (err) {
     showToast("Something went wrong ");
-    console.error(err);
   }
 };
 
@@ -105,7 +112,6 @@ const getSummary = async (id) => {
     alert(data.summary);
   } catch (err) {
     showToast("Something went wrong ");
-    console.error(err);
   }
 };
 
@@ -620,6 +626,7 @@ button:hover {
   }
 }
 `}</style>
+{toast && <div className="toast">{toast}</div>}
     </div>
    
   );
