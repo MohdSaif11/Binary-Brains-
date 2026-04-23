@@ -23,18 +23,18 @@ function Login({ onLogin }) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("Login successful ✅");
+      alert("Login successful ");
 
       // ✅ THIS IS THE FIX
       onLogin();
 
     } else {
-      alert(data.error || "Login failed ❌");
+      alert(data.error || "Login failed ");
     }
 
   } catch (err) {
     console.error(err);
-    alert("Backend not running ❌");
+    alert("Backend not running ");
   }
 };
      
@@ -90,7 +90,7 @@ function Login({ onLogin }) {
         </p>
       </div>
 
-      {/* 🔥 CSS */}
+      {/*  CSS */}
       <style>{`
         .container {
           height: 100vh;

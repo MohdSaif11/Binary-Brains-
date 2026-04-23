@@ -54,13 +54,13 @@ function App() {
         </div>
 
         <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
-          🚀 Customer Success AI
+           Customer Success AI
         </h1>
 
         <Dashboard />
       </div>
 
-      {/* 🤖 CHATBOT (RIGHT SIDE) */}
+      {/*  CHATBOT (RIGHT SIDE) */}
       <div
         style={{
           width: "300px",
@@ -72,7 +72,7 @@ function App() {
           flexDirection: "column",
         }}
       >
-        <h2 style={{ marginBottom: "20px" }}>🤖 AI Assistant</h2>
+        <h2 style={{ marginBottom: "20px" }}> AI Assistant</h2>
         <Chatbot />
       </div>
 

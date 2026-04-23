@@ -1,50 +1,90 @@
 from flask import Blueprint, request, jsonify
-from routes.customers import customers
+import requests
+from db import customers_collection
 
 chat_bp = Blueprint("chat", __name__)
 
+OPENAI_API_KEY = "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"
+
 @chat_bp.route("/chat", methods=["POST"])
 def chat():
-    data = request.get_json()
-    message = data.get("message", "").lower()
+    data = request.json
+    user_message = data.get("message", "")
 
-    at_risk = [c for c in customers if c["usage"] < 50 or c["tickets"] > 3]
-    healthiest = max(customers, key=lambda c: c["usage"])
-    worst = min(customers, key=lambda c: c["usage"])
+    # 🔥 FETCH DATA FROM DB
+    customers = list(customers_collection.find({}, {
+        "name": 1,
+        "health_score": 1,
+        "usage": 1,
+        "tickets": 1,
+        "churn_risk": 1
+    }))
 
-    # 🔥 SMART RESPONSES
+    # Convert ObjectId → string
+    for c in customers:
+        c["_id"] = str(c["_id"])
 
-    if "risk" in message:
-        if at_risk:
-            names = ", ".join([c["name"] for c in at_risk])
-            return jsonify({"reply": f"⚠️ {names} are at risk due to low usage or high tickets."})
-        return jsonify({"reply": "✅ No customers at risk."})
+    try:
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "http://localhost:3000",
+                "X-Title": "Customer Dashboard AI"
+            },
+            json={
+                "model": "openai/gpt-4o-mini",
+                "messages": [
+    {
+        "role": "system",
+        "content": f"""
+You are an AI Customer Insights Assistant.
 
-    elif "action" in message or "what should" in message:
-        actions = []
-        for c in at_risk:
-            if c["usage"] < 50:
-                actions.append(f"{c['name']}: Increase engagement")
-            if c["tickets"] > 3:
-                actions.append(f"{c['name']}: Needs support follow-up")
+You are given real customer data.
 
-        return jsonify({"reply": "\n".join(actions) if actions else "All customers are healthy ✅"})
+Your job:
+- Analyze the data
+- Give clear insights
+- Be concise
 
-    elif "best" in message or "healthiest" in message:
-        return jsonify({"reply": f"🏆 {healthiest['name']} is the healthiest customer ({healthiest['usage']}% usage)."})
+Rules:
+- Use bullet points
+- Always include customer names
+- Include numbers (usage %, tickets, health score)
+- Highlight important insights (like high-risk customers)
+- Avoid generic answers
+- Prioritize most important insights first
 
-    elif "worst" in message:
-        return jsonify({"reply": f"⚠️ {worst['name']} needs attention ({worst['usage']}% usage)."})
+Examples:
 
-    elif "insight" in message:
-        avg = sum(c["usage"] for c in customers) / len(customers)
-        tickets = sum(c["tickets"] for c in customers)
+Top 3 high-risk customers:
+• John – Usage 32%, Tickets 5
+• Priya – Usage 28%, Tickets 6
 
-        return jsonify({
-            "reply": f"📊 Avg usage: {avg:.1f}%\n🎫 Tickets: {tickets}\n⚠️ Risk: {len(at_risk)} customers"
-        })
+Healthy customers:
+• Alex – Health 90, Usage 85%
 
-    else:
-        return jsonify({
-            "reply": "Try asking about risk, actions, insights, or best/worst customer."
-        })
+Customer Data:
+{customers}
+"""
+    },
+                    {
+                        "role": "user",
+                        "content": user_message
+                    }
+                ]
+            }
+        )
+
+        result = response.json()
+
+        if "choices" in result:
+            reply = result["choices"][0]["message"]["content"]
+        else:
+            reply = str(result)
+
+        return jsonify({"reply": reply})
+
+    except Exception as e:
+        return jsonify({"reply": f"Error: {str(e)}"})

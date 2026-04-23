@@ -1,2 +1,5 @@
 flask
-faker
+flask-cors
+pymongo
+requests
+dnspython

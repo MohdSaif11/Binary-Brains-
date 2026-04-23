@@ -1,8 +1,8 @@
-# 🚀 Smart Customer Management Portal with AI-Driven Insights
+#  Smart Customer Management Portal with AI-Driven Insights
 
 ---
 
-## 📌 Overview
+##  Overview
 
 A full-stack AI-powered web application that helps businesses **manage customers, predict churn, and gain intelligent insights**.
 
@@ -10,7 +10,7 @@ This system combines **data analytics, AI insights, and a modern UI** to provide
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - React.js  
@@ -31,18 +31,18 @@ This system combines **data analytics, AI insights, and a modern UI** to provide
 
 ---
 
-## ⚙️ Features
+##  Features
 
 ---
 
-### 🔐 Authentication System
+###  Authentication System
 - Login / Signup  
 - Persistent login using localStorage  
 - Backend validation  
 
 ---
 
-### 🎨 Premium UI/UX (HIGHLIGHT 🚀)
+###  Premium UI/UX (HIGHLIGHT )
 
 - Glassmorphism design  
 - Neon dark theme (blue + purple)  
@@ -53,7 +53,7 @@ This system combines **data analytics, AI insights, and a modern UI** to provide
 
 ---
 
-### 🤖 AI Assistant (ChatGPT-style)
+###  AI Assistant (ChatGPT-style)
 
 - Chat bubble interface  
 - Real-time conversation UI  
@@ -66,18 +66,18 @@ This system combines **data analytics, AI insights, and a modern UI** to provide
 
 ---
 
-### 👥 Customer Management
+###  Customer Management
 
 - View all customers  
 - Track:
-  - Usage 📊  
-  - Support tickets 🎫  
-  - Region 🌍  
+  - Usage 
+  - Support tickets   
+  - Region   
   - Plans  
 
 ---
 
-### 📊 Dashboard (Advanced UI)
+###  Dashboard (Advanced UI)
 
 - Glassmorphism customer cards  
 - Clickable customer detail popup  
@@ -85,16 +85,16 @@ This system combines **data analytics, AI insights, and a modern UI** to provide
 
 ---
 
-### 📈 Data Visualization
+###  Data Visualization
 
-- 📊 Usage Bar Chart  
-- 🎫 Tickets Bar Chart  
+-  Usage Bar Chart  
+-  Tickets Bar Chart  
 - Positioned at bottom (real dashboard design)  
 - Styled with dark neon theme  
 
 ---
 
-### 📌 Customer Details Popup
+###  Customer Details Popup
 
 - Click any customer  
 - View detailed information  
@@ -102,7 +102,7 @@ This system combines **data analytics, AI insights, and a modern UI** to provide
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 BinaryBrains/
@@ -129,9 +129,9 @@ BinaryBrains/
 
 ---
 
-## ▶️ How to Run
+##  How to Run
 
-### 1️⃣ Backend Setup
+###  Backend Setup
 
 ```bash
 cd server
@@ -144,7 +144,7 @@ http://127.0.0.1:5000
 
 ---
 
-### 2️⃣ Frontend Setup
+###  Frontend Setup
 
 ```bash
 cd client
@@ -158,7 +158,7 @@ http://localhost:3000
 
 ---
 
-## 📊 Sample API Endpoints
+##  Sample API Endpoints
 
 - `POST /login` → Login user  
 - `POST /signup` → Register user  
@@ -169,7 +169,7 @@ http://localhost:3000
 
 ---
 
-## 🎯 Demo Flow
+##  Demo Flow
 
 1. Login / Signup  
 2. Explore dashboard  
@@ -180,20 +180,19 @@ http://localhost:3000
 
 ---
 
-## 🏆 Key Highlights
+##  Key Highlights
 
-- ✅ Full-stack application  
-- ✅ AI-powered insights  
-- ✅ ChatGPT-style assistant  
-- ✅ Neon animated UI  
-- ✅ Interactive dashboard  
-- ✅ Data visualization  
-- ✅ Real-time user interaction  
+-  Full-stack application  
+-  AI-powered insights  
+-  ChatGPT-style assistant  
+-  Neon animated UI  
+-  Interactive dashboard  
+-  Data visualization  
+-  Real-time user interaction  
 
 ---
 
-## 🚀 Future Improvements
-
+##  Future Improvements
 - Integrate OpenAI API  
 - Add database (MongoDB/PostgreSQL)  
 - JWT authentication  
@@ -202,13 +201,13 @@ http://localhost:3000
 
 ---
 
-## 👩‍💻 Author
+##  Author
 
 **Mehak**  
 **Mohammed Saif R** 
 
 ---
 
-## ⭐ Demo Line (IMPORTANT)
+##  Demo Line (IMPORTANT)
 
 > “This is an AI-powered customer success platform that predicts churn and provides actionable insights using a modern, interactive dashboard.”

@@ -1,15 +1,19 @@
 from flask import Blueprint, request, jsonify
+from db import customers_collection
+from bson import ObjectId
+from bson.errors import InvalidId
 import random
 
 customers_bp = Blueprint("customers", __name__)
 
-# 🧠 HEALTH FUNCTION
+#  HEALTH FUNCTION
 def calculate_health(customer):
     usage_score = customer["usage"]
     ticket_penalty = customer["tickets"] * 5
-
     health = usage_score - ticket_penalty
     return max(0, min(100, health))
+
+
 def calculate_churn(customer):
     if customer["usage"] < 40 or customer["tickets"] > 4:
         return "High"
@@ -18,35 +22,51 @@ def calculate_churn(customer):
     else:
         return "Low"
 
-# 🔥 DATA
-names = ["John", "Sara", "Amit", "Priya", "Alex", "Ravi", "Neha"]
-regions = ["India", "US", "UK", "Germany", "Canada"]
 
-customers = []
+#  AUTO SEED (VERY IMPORTANT)
+def seed_if_empty():
+    if customers_collection.count_documents({}) == 0:
+        names = ["John", "Sara", "Amit", "Priya", "Alex", "Ravi", "Neha"]
+        regions = ["India", "US", "UK", "Germany", "Canada"]
 
-# 🔥 GENERATE 200 CUSTOMERS
-for i in range(1, 201):
-    customer = {
-        "id": i,
-        "name": random.choice(names) + str(i),
-        "region": random.choice(regions),
-        "usage": random.randint(20, 100),
-        "tickets": random.randint(0, 6),
-        "devices": [],
-        "health_score": 0,
-        "churn_risk": ""
-    }
+        data = []
 
-    # ✅ APPLY HEALTH
-    customer["health_score"] = calculate_health(customer)
-    customer["churn_risk"] = calculate_churn(customer)
+        for i in range(1, 201):
+            customer = {
+                "name": random.choice(names) + str(i),
+                "region": random.choice(regions),
+                "usage": random.randint(20, 100),
+                "tickets": random.randint(0, 6),
+                "devices": []
+            }
 
-    customers.append(customer)
+            customer["health_score"] = calculate_health(customer)
+            customer["churn_risk"] = calculate_churn(customer)
+
+            data.append(customer)
+
+        customers_collection.insert_many(data)
 
 
-# 📌 GET
+#  GET ALL CUSTOMERS
 @customers_bp.route("/customers", methods=["GET"])
 def get_customers():
+    seed_if_empty()  # 🔥 AUTO LOAD DATA
+
+    customers = []
+
+    for c in customers_collection.find():
+        customers.append({
+            "id": str(c["_id"]),
+            "name": c["name"],
+            "region": c["region"],
+            "usage": c.get("usage", 0),
+            "tickets": c.get("tickets", 0),
+            "devices": c.get("devices", []),
+            "health_score": c.get("health_score", 0),
+            "churn_risk": c.get("churn_risk", "Low")
+        })
+
     return jsonify(customers)
 
 
@@ -56,87 +76,111 @@ def add_customer():
     data = request.json
 
     new_customer = {
-        "id": len(customers) + 1,
         "name": data["name"],
         "region": data["region"],
         "usage": random.randint(30, 80),
         "tickets": 0,
-        "devices": [],
-        "health_score": 0,
-        "churn_risk": ""
+        "devices": []
     }
 
     new_customer["health_score"] = calculate_health(new_customer)
     new_customer["churn_risk"] = calculate_churn(new_customer)
 
-    customers.append(new_customer)
+    customers_collection.insert_one(new_customer)
+
     return jsonify({"message": "Customer added"})
 
 
-# ❌ DELETE
-@customers_bp.route("/customers/<int:id>", methods=["DELETE"])
+#  DELETE CUSTOMER
+@customers_bp.route("/customers/<id>", methods=["DELETE"])
 def delete_customer(id):
-    global customers
-    customers = [c for c in customers if c["id"] != id]
-    return jsonify({"message": "Deleted"})
+    try:
+        customers_collection.delete_one({"_id": ObjectId(id)})
+        return jsonify({"message": "Deleted"})
+    except InvalidId:
+        return jsonify({"error": "Invalid ID"}), 400
 
 
-# 🎫 ADD TICKET
-@customers_bp.route("/customers/<int:id>/ticket", methods=["POST"])
+#  ADD TICKET
+@customers_bp.route("/customers/<id>/ticket", methods=["POST"])
 def add_ticket(id):
-    for c in customers:
-        if c["id"] == id:
-            c["tickets"] += 1
+    try:
+        customer = customers_collection.find_one({"_id": ObjectId(id)})
+    except InvalidId:
+        return jsonify({"error": "Invalid ID"}), 400
 
-            # ✅ UPDATE HEALTH
-            c["health_score"] = calculate_health(c)
-            c["churn_risk"] = calculate_churn(c)
+    if customer:
+        updated_tickets = customer.get("tickets", 0) + 1
 
+        updated_customer = {
+            **customer,
+            "tickets": updated_tickets
+        }
 
-            return jsonify({"message": "Ticket added"})
+        updated_customer["health_score"] = calculate_health(updated_customer)
+        updated_customer["churn_risk"] = calculate_churn(updated_customer)
+
+        customers_collection.update_one(
+            {"_id": ObjectId(id)},
+            {"$set": {
+                "tickets": updated_customer["tickets"],
+                "health_score": updated_customer["health_score"],
+                "churn_risk": updated_customer["churn_risk"]
+            }}
+        )
+
+        return jsonify({"message": "Ticket added"})
 
     return jsonify({"error": "Not found"}), 404
 
 
-# 💻 ADD DEVICE
-@customers_bp.route("/customers/<int:id>/device", methods=["POST"])
+#  ADD DEVICE
+@customers_bp.route("/customers/<id>/device", methods=["POST"])
 def add_device(id):
-    data = request.json
+    try:
+        data = request.json
 
-    for c in customers:
-        if c["id"] == id:
-            c["devices"].append(data["device"])
-            return jsonify({"message": "Device added"})
+        customers_collection.update_one(
+            {"_id": ObjectId(id)},
+            {"$push": {"devices": data["device"]}}
+        )
 
-    return jsonify({"error": "Not found"}), 404
+        return jsonify({"message": "Device added"})
 
-@customers_bp.route("/customers/<int:id>/summary", methods=["GET"])
+    except InvalidId:
+        return jsonify({"error": "Invalid ID"}), 400
+
+
+#  CUSTOMER SUMMARY
+@customers_bp.route("/customers/<id>/summary", methods=["GET"])
 def get_summary(id):
-    for c in customers:
-        if c["id"] == id:
+    try:
+        c = customers_collection.find_one({"_id": ObjectId(id)})
+    except InvalidId:
+        return jsonify({"error": "Invalid ID"}), 400
 
-            summary = f"""
-📧 Customer Report
+    if c:
+        summary = f"""
+ Customer Report
 
 Name: {c['name']}
 Region: {c['region']}
 
-📊 Usage: {c['usage']}%
-🎫 Tickets: {c['tickets']}
-💚 Health Score: {c['health_score']}
-⚠️ Churn Risk: {c['churn_risk']}
+ Usage: {c['usage']}%
+ Tickets: {c['tickets']}
+ Health Score: {c['health_score']}
+ Churn Risk: {c['churn_risk']}
 
-🧠 Recommendation:
+ Recommendation:
 """
 
-            # 🔥 Smart suggestions
-            if c["churn_risk"] == "High":
-                summary += "Customer is at high risk. Increase engagement and resolve issues immediately."
-            elif c["churn_risk"] == "Medium":
-                summary += "Monitor customer and improve product usage."
-            else:
-                summary += "Customer is healthy. Maintain engagement."
+        if c["churn_risk"] == "High":
+            summary += "Customer is at high risk. Increase engagement and resolve issues immediately."
+        elif c["churn_risk"] == "Medium":
+            summary += "Monitor customer and improve product usage."
+        else:
+            summary += "Customer is healthy. Maintain engagement."
 
-            return jsonify({"summary": summary})
+        return jsonify({"summary": summary})
 
     return jsonify({"error": "Customer not found"}), 404

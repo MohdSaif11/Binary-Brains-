@@ -33,7 +33,7 @@ function CustomerCard({ customer }) {
         Churn: {churn.churn}
       </p>
 
-      {churn.churn === "Yes" && <p>⚠️ High Risk</p>}
+      {churn.churn === "Yes" && <p> High Risk</p>}
     </div>
   );
 }

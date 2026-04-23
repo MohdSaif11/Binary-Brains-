@@ -27,7 +27,7 @@ function Chatbot() {
 
       const botMessage = {
         type: "bot",
-        text: data.reply || "No response from AI 🤖"
+        text: data.reply || "No response from AI "
       };
 
       // ✅ Append bot reply safely
@@ -38,7 +38,7 @@ function Chatbot() {
 
       setMessages((prev) => [
         ...prev,
-        { type: "bot", text: "Error connecting to server ❌" }
+        { type: "bot", text: "Error connecting to server " }
       ]);
     }
 

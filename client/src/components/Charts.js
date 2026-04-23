@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 function Charts({ data }) {
   return (
     <div style={{ marginTop: "30px" }}>
-      <h2>📊 Analytics</h2>
+      <h2> Analytics</h2>
 
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data}>
