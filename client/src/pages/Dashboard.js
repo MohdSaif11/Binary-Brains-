@@ -117,7 +117,7 @@ const getSummary = async (id) => {
   }
 };
 
-    // ✅ ONLY ADDED THIS
+    //✅ ONLY ADDED THIS
   const churnData = [
     { name: "High", value: customers.filter(c => c.churn_risk === "High").length },
     { name: "Medium", value: customers.filter(c => c.churn_risk === "Medium").length },
@@ -330,19 +330,15 @@ const getSummary = async (id) => {
     <ResponsiveContainer width="100%" height={250}>
       <PieChart>
         <Pie
-          data={[
-            { name: "High", value: customers.filter(c => c.churn_risk === "High").length },
-            { name: "Medium", value: customers.filter(c => c.churn_risk === "Medium").length },
-            { name: "Low", value: customers.filter(c => c.churn_risk === "Low").length }
-          ]}
+  data={churnData}
+  dataKey="value"
           dataKey="value"
           nameKey="name"
           outerRadius={90}
           label
-        >
-          <Cell fill="#ef4444" />
-          <Cell fill="#f97316" />
-          <Cell fill="#22c55e" />
+        >{churnData.map((entry, index) => (
+  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+))}
         </Pie>
         <Tooltip />
         <Legend />
