@@ -11,13 +11,15 @@ function Dashboard() {
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
   const [region, setRegion] = useState("");
-  const [toast, setToast] = useState("");
   const [filterRisk, setFilterRisk] = useState("");
 const [filterRegion, setFilterRegion] = useState("");
 const [sortByUsage, setSortByUsage] = useState(false);
  // ONLY URL + syntax fixes done
+const [toast, setToast] = useState("");
 
 const BASE_URL = "https://binary-brains-uttd.onrender.com";
+
+// eslint-disable-next-line no-unused-vars
 const showToast = (msg) => {
     setToast(msg);
     setTimeout(() => setToast(""), 3000);
